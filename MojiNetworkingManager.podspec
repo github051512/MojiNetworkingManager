@@ -17,7 +17,7 @@ Pod::Spec.new do |spec|
 
   spec.name         = "MojiNetworkingManager"
   spec.version      = "0.0.1"
-  spec.summary      = "A short description of MojiNetworkingManager."
+  spec.summary      = "关于AFNetworking的再次封装."
 
   # This description is used to generate tags and improve search results.
   #   * Think: What does it do? Why did you write it? What is the focus?
@@ -25,9 +25,10 @@ Pod::Spec.new do |spec|
   #   * Write the description between the DESC delimiters below.
   #   * Finally, don't worry about the indent, CocoaPods strips it!
   spec.description  = <<-DESC
+  						关于AFNetworking的再次封装。主要是对网络数据的缓存以及操作。
                    DESC
 
-  spec.homepage     = "http://EXAMPLE/MojiNetworkingManager"
+  spec.homepage     = "https://github.com/github051512/MojiNetworkingManager"
   # spec.screenshots  = "www.example.com/screenshots_1.gif", "www.example.com/screenshots_2.gif"
 
 
@@ -38,7 +39,7 @@ Pod::Spec.new do |spec|
   #  Popular ones are 'MIT', 'BSD' and 'Apache License, Version 2.0'.
   #
 
-  spec.license      = "MIT (example)"
+  spec.license      = "MIT"
   # spec.license      = { :type => "MIT", :file => "FILE_LICENSE" }
 
 
@@ -64,7 +65,7 @@ Pod::Spec.new do |spec|
   #
 
   # spec.platform     = :ios
-  # spec.platform     = :ios, "5.0"
+  spec.platform     = :ios, "10.0"
 
   #  When using multiple platforms
   # spec.ios.deployment_target = "5.0"
@@ -79,7 +80,7 @@ Pod::Spec.new do |spec|
   #  Supports git, hg, bzr, svn and HTTP.
   #
 
-  spec.source       = { :git => "http://EXAMPLE/MojiNetworkingManager.git", :tag => "#{spec.version}" }
+  spec.source       = { :git => "https://github.com/github051512/MojiNetworkingManager.git", :tag => "#{spec.version}" }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -90,8 +91,17 @@ Pod::Spec.new do |spec|
   #  Not including the public_header_files will make all headers public.
   #
 
-  spec.source_files  = "Classes", "Classes/**/*.{h,m}"
-  spec.exclude_files = "Classes/Exclude"
+  spec.source_files  = 'MJNetworking/*.{h,m}'
+ 
+  spec.subspec 'Cache' do |ss|
+  ss.source_files = 'MJNetworking/Cache/*.{h,m}'
+  end
+
+  spec.subspec 'Manager' do |ss|
+  ss.source_files = 'MJNetworking/Manager/*.{h,m}'
+  end
+
+  # spec.exclude_files = "Classes/Exclude"
 
   # spec.public_header_files = "Classes/**/*.h"
 
@@ -132,6 +142,6 @@ Pod::Spec.new do |spec|
   # spec.requires_arc = true
 
   # spec.xcconfig = { "HEADER_SEARCH_PATHS" => "$(SDKROOT)/usr/include/libxml2" }
-  # spec.dependency "JSONKit", "~> 1.4"
+  spec.dependency "AFNetworking", "~> 3.2.1"
 
 end
