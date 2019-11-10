@@ -91,15 +91,15 @@ Pod::Spec.new do |spec|
   #  Not including the public_header_files will make all headers public.
   #
 
-  spec.source_files  = 'MJNetworking/*.{h,m}'
- 
-  spec.subspec 'Cache' do |ss|
-  ss.source_files = 'MJNetworking/Cache/*.{h,m}'
-  end
+  spec.source_files  = 'MJNetworking/**/*.{h,m}'
+  # spec.public_header_files = 'MJNetworking/MJNetworking.h'
+  # spec.subspec 'Cache' do |css|
+  # css.source_files = 'MJNetworking/Cache/*.{h,m}'
+  # end
 
-  spec.subspec 'Manager' do |ss|
-  ss.source_files = 'MJNetworking/Manager/*.{h,m}'
-  end
+  # spec.subspec 'Manager' do |mss|
+  # mss.source_files = 'MJNetworking/Manager/*.{h,m}'
+  # end
 
   # spec.exclude_files = "Classes/Exclude"
 
