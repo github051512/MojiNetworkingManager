@@ -22,6 +22,7 @@
     NSError *error = nil;
     
     if (![[NSFileManager defaultManager] fileExistsAtPath:directory isDirectory:nil]) {
+        
         [[NSFileManager defaultManager] createDirectoryAtPath:directory withIntermediateDirectories:YES attributes:nil error:&error];
     }
     
@@ -31,23 +32,21 @@
     }
     
     NSString *filePath = [directory stringByAppendingPathComponent:filename];
-    
     [[NSFileManager defaultManager] createFileAtPath:filePath contents:data attributes:nil];
-    
 }
 
 + (id)readDataFromDir:(NSString *)directory
              filename:(NSString *)filename {
+    
     assert(directory);
     
     assert(filename);
     
-    NSData *data = nil;
-    
     NSString *filePath = [directory stringByAppendingPathComponent:filename];
-    
+
+    NSData *data = [[NSData alloc] init];
     data = [[NSFileManager defaultManager] contentsAtPath:filePath];
-    
+        
     return data;
 }
 

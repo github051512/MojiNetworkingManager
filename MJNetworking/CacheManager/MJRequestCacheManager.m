@@ -12,11 +12,11 @@
 #import "MJLRUManager.h"
 #import <CommonCrypto/CommonDigest.h>
 
-static NSString *const cacheDirKey = @"cacheDirKey";
+static NSString *const cacheDirKey = @"MJCacheDirKey";
 
-static NSString *const downloadDirKey = @"downloadDirKey";
+static NSString *const downloadDirKey = @"MJDownloadDirKey";
 
-static NSUInteger diskCapacity = 40 * 1024 * 1024;
+static NSUInteger diskCapacity = 60 * 1024 * 1024;
 
 static NSTimeInterval cacheTime = 7 * 24 * 60 * 60;
 
@@ -74,15 +74,27 @@ static NSTimeInterval cacheTime = 7 * 24 * 60 * 60;
         
         if (!directoryPath) {
         
-            directoryPath = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES)[0] stringByAppendingPathComponent:@"MJNetworking"] stringByAppendingPathComponent:@"networkCache"];
+            directoryPath = [@"MJNetworking" stringByAppendingPathComponent:@"NetworkCache"];
+            //[[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES)[0] stringByAppendingPathComponent:@"MJNetworking"] stringByAppendingPathComponent:@"NetworkCache"];
+            
             [[NSUserDefaults standardUserDefaults] setObject:directoryPath forKey:cacheDirKey];
+            
             [[NSUserDefaults standardUserDefaults] synchronize];
         }
         
-        [MJDiskCache writeData:data toDir:directoryPath filename:hash];
+        [MJDiskCache writeData:data toDir:[self dataFilePathWithName:directoryPath] filename:hash];
         
         [[MJLRUManager shareManager] addFileNode:hash];
     }
+}
+
+- (NSString *)dataFilePathWithName:(NSString *)name {
+    
+    NSString *path = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject];
+    
+    NSString *completitonPath = [path stringByAppendingPathComponent:name];
+    
+    return completitonPath;
 }
 
 - (id)getCacheResponseObjectWithRequestUrl:(NSString *)requestUrl
@@ -103,13 +115,25 @@ static NSTimeInterval cacheTime = 7 * 24 * 60 * 60;
         NSString *directoryPath = [[NSUserDefaults standardUserDefaults] objectForKey:cacheDirKey];
         
         if (directoryPath) {
-            cacheData = [MJDiskCache readDataFromDir:directoryPath filename:hash];
+            cacheData = [MJDiskCache readDataFromDir:[self dataFilePathWithName:directoryPath] filename:hash];
             
             if (cacheData) [[MJLRUManager shareManager] refreshIndexOfFileNode:hash];
         }
     }
     
-    return cacheData;
+    if (cacheData) {
+        
+        NSError *error = nil;
+        id  responseJson = [NSJSONSerialization JSONObjectWithData:cacheData options:NSJSONReadingMutableContainers error:&error];
+        
+        return responseJson;
+        
+    } else {
+        
+        return nil;
+    }
+    
+    
 }
 
 - (void)storeDownloadData:(NSData *)data
@@ -136,7 +160,9 @@ static NSTimeInterval cacheTime = 7 * 24 * 60 * 60;
     NSString *directoryPath = nil;
     directoryPath = [[NSUserDefaults standardUserDefaults] objectForKey:downloadDirKey];
     if (!directoryPath) {
-        directoryPath = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES)[0] stringByAppendingPathComponent:@"MJNetworking"] stringByAppendingPathComponent:@"download"];
+        directoryPath = [@"MJNetworking" stringByAppendingPathComponent:@"MJDownload"];
+        
+//        [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES)[0] stringByAppendingPathComponent:@""] stringByAppendingPathComponent:@"Download"];
         
         [[NSUserDefaults standardUserDefaults] setObject:directoryPath forKey:downloadDirKey];
         [[NSUserDefaults standardUserDefaults] synchronize];
@@ -144,7 +170,6 @@ static NSTimeInterval cacheTime = 7 * 24 * 60 * 60;
     
     
     [MJDiskCache writeData:data toDir:directoryPath filename:fileName];
-    
 }
 
 - (NSURL *)getDownloadDataFromCacheWithRequestUrl:(NSString *)requestUrl {
@@ -155,7 +180,6 @@ static NSTimeInterval cacheTime = 7 * 24 * 60 * 60;
     NSString *type = nil;
     NSArray *strArray = nil;
     NSURL *fileUrl = nil;
-    
     
     strArray = [requestUrl componentsSeparatedByString:@"."];
     if (strArray.count > 0) {
@@ -168,10 +192,9 @@ static NSTimeInterval cacheTime = 7 * 24 * 60 * 60;
         fileName = [NSString stringWithFormat:@"%@",[self md5:requestUrl]];
     }
     
-    
     NSString *directoryPath = [[NSUserDefaults standardUserDefaults] objectForKey:downloadDirKey];
     
-    if (directoryPath) data = [MJDiskCache readDataFromDir:directoryPath filename:fileName];
+    if (directoryPath) data = [MJDiskCache readDataFromDir:[self dataFilePathWithName:directoryPath] filename:fileName];
     
     if (data) {
         NSString *path = [directoryPath stringByAppendingPathComponent:fileName];
@@ -182,6 +205,7 @@ static NSTimeInterval cacheTime = 7 * 24 * 60 * 60;
 }
 
 - (NSUInteger)totalCacheSize {
+    
     NSString *diretoryPath = [[NSUserDefaults standardUserDefaults] objectForKey: cacheDirKey];
     
     return [MJDiskCache dataSizeInDir:diretoryPath];
@@ -195,12 +219,14 @@ static NSTimeInterval cacheTime = 7 * 24 * 60 * 60;
 }
 
 - (void)clearDownloadData {
+    
     NSString *diretoryPath = [[NSUserDefaults standardUserDefaults] objectForKey:downloadDirKey];
     
     [MJDiskCache clearDataIinDir:diretoryPath];
 }
 
 - (NSString *)getDownDirectoryPath {
+    
     NSString *diretoryPath = [[NSUserDefaults standardUserDefaults] objectForKey:downloadDirKey];
     return diretoryPath;
 }

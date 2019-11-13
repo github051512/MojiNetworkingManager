@@ -6,12 +6,11 @@
 //  Copyright © 2019 liuzhiwei. All rights reserved.
 //  MJRequestCacheManager
 
-#import "MJNetworking.h"
+#import "MJNetworkingManager.h"
+
 #import "AFNetworking.h"
-#import "AFNetworkActivityIndicatorManager.h"
+
 #import "MJRequestCacheManager.h"
-#import "MJNetworking+CacheManager.h"
-#import "MJNetworking+RequestManager.h"
 
 #define MJ_ERROR_IMFORMATION @"网络出现错误，请检查网络连接"
 
@@ -29,7 +28,31 @@ static MJNetworkStatus  networkStatus;
 ///默认网络超时设置
 static NSTimeInterval   requestTimeout = 30.f;
 
-@implementation MJNetworking
+
+@interface NSURLRequest (decide)
+
+//判断是否是同一个请求（依据是请求url和参数是否相同）
+- (BOOL)isTheSameRequest:(NSURLRequest *)request;
+
+@end
+
+@implementation NSURLRequest (decide)
+
+- (BOOL)isTheSameRequest:(NSURLRequest *)request {
+    if ([self.HTTPMethod isEqualToString:request.HTTPMethod]) {
+        if ([self.URL.absoluteString isEqualToString:request.URL.absoluteString]) {
+            if ([self.HTTPMethod isEqualToString:@"GET"]||[self.HTTPBody isEqualToData:request.HTTPBody]) {
+                return YES;
+            }
+        }
+    }
+    return NO;
+}
+
+@end
+
+
+@implementation MJNetworkingManager
 
 #pragma mark - manager
 + (AFHTTPSessionManager *)manager {
@@ -133,11 +156,11 @@ static NSTimeInterval   requestTimeout = 30.f;
         return session;
     }
     
-    id responseObj = [[MJRequestCacheManager shareManager] getCacheResponseObjectWithRequestUrl:url params:params];
+    id cacheResponseObj = [[MJRequestCacheManager shareManager] getCacheResponseObjectWithRequestUrl:url params:params];
     
-    ///如果是请求缓存数据并且有缓存数据则返回缓存数据
-    if (responseObj && cache) {
-        if (successBlock) successBlock(responseObj);
+    ///如果是请求并且需要缓存 则先返回缓存数据
+    if (cacheResponseObj && refresh) {
+        if (successBlock) successBlock(cacheResponseObj);
     }
     
     session = [manager GET:url
@@ -465,6 +488,66 @@ static NSTimeInterval   requestTimeout = 30.f;
 + (NSArray *)currentRunningTasks {
     return [[self allTasks] copy];
 }
+
+#pragma mark - Other
+
+///是否是同一个网络请求
++ (BOOL)haveSameRequestInTasksPool:(MJURLSessionTask *)task {
+    __block BOOL isSame = NO;
+    [[self currentRunningTasks] enumerateObjectsUsingBlock:^(MJURLSessionTask *obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([task.originalRequest isTheSameRequest:obj.originalRequest]) {
+            isSame  = YES;
+            *stop = YES;
+        }
+    }];
+    return isSame;
+}
+
+///取消相同的网络请求
++ (MJURLSessionTask *)cancleSameRequestInTasksPool:(MJURLSessionTask *)task {
+    __block MJURLSessionTask *oldTask = nil;
+    
+    [[self currentRunningTasks] enumerateObjectsUsingBlock:^(MJURLSessionTask *obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([task.originalRequest isTheSameRequest:obj.originalRequest]) {
+            if (obj.state == NSURLSessionTaskStateRunning) {
+                [obj cancel];
+                oldTask = obj;
+            }
+            *stop = YES;
+        }
+    }];
+    
+    return oldTask;
+}
+
+#pragma mark - Cache File
+
++ (NSUInteger)totalCacheSize {
+    return [[MJRequestCacheManager shareManager] totalCacheSize];
+}
+
++ (NSUInteger)totalDownloadDataSize {
+    return [[MJRequestCacheManager shareManager] totalDownloadDataSize];
+}
+
++ (void)clearDownloadData {
+    [[MJRequestCacheManager shareManager] clearDownloadData];
+}
+
++ (NSString *)getDownDirectoryPath {
+    return [[MJRequestCacheManager shareManager] getDownDirectoryPath];
+}
+
++ (NSString *)getCacheDiretoryPath {
+    
+    return [[MJRequestCacheManager shareManager] getCacheDiretoryPath];
+}
+
++ (void)clearTotalCache {
+    [[MJRequestCacheManager shareManager] clearTotalCache];
+}
+
+
 
 @end
 

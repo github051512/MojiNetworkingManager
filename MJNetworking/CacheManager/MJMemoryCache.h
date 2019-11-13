@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
  *  @param data 数据
  *  @param key  键值
  */
-+ (void)writeData:(id) data forKey:(NSString *)key;
++ (void)writeData:(id)data forKey:(NSString *)key;
 
 /**
  *  从内存中读取数据

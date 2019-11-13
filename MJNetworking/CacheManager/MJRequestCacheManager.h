@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MJRequestCacheManager : NSObject
 
 /**
- *  默认的磁盘空间是40MB，缓存有效期是7天
+ *  默认的磁盘空间是60MB，缓存有效期是7天
  *
  *  @return manager
  */
@@ -25,7 +25,8 @@ NS_ASSUME_NONNULL_BEGIN
  *  @param time     缓存时间
  *  @param capacity 磁盘空间
  */
-- (void)setCacheTime:(NSTimeInterval) time diskCapacity:(NSUInteger) capacity;
+- (void)setCacheTime:(NSTimeInterval)time
+        diskCapacity:(NSUInteger)capacity;
 
 /**
  *  缓存响应数据
@@ -34,7 +35,9 @@ NS_ASSUME_NONNULL_BEGIN
  *  @param requestUrl     请求url
  *  @param params         请求参数
  */
-- (void)cacheResponseObject:(id)responseObject requestUrl:(NSString *)requestUrl params:(NSDictionary *)params;
+- (void)cacheResponseObject:(id)responseObject
+                 requestUrl:(NSString *)requestUrl
+                     params:(NSDictionary *)params;
 
 /**
  *  获取响应数据
@@ -44,7 +47,8 @@ NS_ASSUME_NONNULL_BEGIN
  *
  *  @return 响应数据
  */
-- (id)getCacheResponseObjectWithRequestUrl:(NSString *)requestUrl params:(NSDictionary *)params;
+- (id)getCacheResponseObjectWithRequestUrl:(NSString *)requestUrl
+                                    params:(NSDictionary *)params;
 
 /**
  *  存储下载文件

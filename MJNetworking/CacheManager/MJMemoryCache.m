@@ -7,7 +7,6 @@
 //
 
 #import "MJMemoryCache.h"
-#import <UIKit/UIKit.h>
 
 static NSCache *shareCache;
 
@@ -17,6 +16,7 @@ static NSCache *shareCache;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         if (shareCache == nil) shareCache = [[NSCache alloc] init];
+        
     });
     
     //当收到内存警报时，清空内存缓存
@@ -36,6 +36,8 @@ static NSCache *shareCache;
     
     [cache setObject:data forKey:key];
     
+    NSLog(@"%@",[cache objectForKey:key]);
+    
 }
 
 + (id)readDataWithKey:(NSString *)key {
@@ -47,11 +49,11 @@ static NSCache *shareCache;
     
     data = [cache objectForKey:key];
     
-    
     return data;
 }
 
 - (void)dealloc {
+  
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidReceiveMemoryWarningNotification object:nil];
 }
 

@@ -96,7 +96,7 @@ typedef MJDownloadProgress MJPostProgress;
 typedef MJResponseFailBlock MJDownloadFailBlock;
 
 
-@interface MJNetworking : NSObject
+@interface MJNetworkingManager : NSObject
 
 /**
  *  正在运行的网络任务
@@ -146,9 +146,9 @@ typedef MJResponseFailBlock MJDownloadFailBlock;
                   refreshRequest:(BOOL)refresh
                            cache:(BOOL)cache
                           params:(NSDictionary *)params
-                   progressBlock:(MJGetProgress)progressBlock
-                    successBlock:(MJResponseSuccessBlock)successBlock
-                       failBlock:(MJResponseFailBlock)failBlock;
+                   progressBlock:(MJGetProgress __nullable)progressBlock
+                    successBlock:(MJResponseSuccessBlock __nullable)successBlock
+                       failBlock:(MJResponseFailBlock __nullable)failBlock;
 
 
 
@@ -170,9 +170,9 @@ typedef MJResponseFailBlock MJDownloadFailBlock;
                    refreshRequest:(BOOL)refresh
                             cache:(BOOL)cache
                            params:(NSDictionary *)params
-                    progressBlock:(MJPostProgress)progressBlock
-                     successBlock:(MJResponseSuccessBlock)successBlock
-                        failBlock:(MJResponseFailBlock)failBlock;
+                    progressBlock:(MJPostProgress __nullable)progressBlock
+                     successBlock:(MJResponseSuccessBlock __nullable)successBlock
+                        failBlock:(MJResponseFailBlock __nullable)failBlock;
 
 
 
@@ -196,9 +196,9 @@ typedef MJResponseFailBlock MJDownloadFailBlock;
                                    type:(NSString *)type
                                    name:(NSString *)name
                                mimeType:(NSString *)mimeType
-                          progressBlock:(MJUploadProgressBlock)progressBlock
-                           successBlock:(MJResponseSuccessBlock)successBlock
-                              failBlock:(MJResponseFailBlock)failBlock;
+                          progressBlock:(MJUploadProgressBlock __nullable)progressBlock
+                           successBlock:(MJResponseSuccessBlock __nullable)successBlock
+                              failBlock:(MJResponseFailBlock __nullable)failBlock;
 
 
 /**
@@ -220,9 +220,9 @@ typedef MJResponseFailBlock MJDownloadFailBlock;
                               type:(NSString *)type
                               name:(NSString *)name
                           mimeType:(NSString *)mimeTypes
-                     progressBlock:(MJUploadProgressBlock)progressBlock
-                      successBlock:(MJMultUploadSuccessBlock)successBlock
-                         failBlock:(MJMultUploadFailBlock)failBlock;
+                     progressBlock:(MJUploadProgressBlock __nullable)progressBlock
+                      successBlock:(MJMultUploadSuccessBlock __nullable)successBlock
+                         failBlock:(MJMultUploadFailBlock __nullable)failBlock;
 
 /**
  *  文件下载
